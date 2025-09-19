@@ -1,0 +1,11 @@
+discord>=2.3.2
+asyncio>=3.4.3
+spotipy>=2.25.1
+openai>=1.82.0
+
+wikipedia~=1.4.0
+requests~=2.32.3
+pycountry~=24.6.1
+beautifulsoup4~=4.13.4
+lxml~=5.4.0
+lyricsgenius~=3.6.2
