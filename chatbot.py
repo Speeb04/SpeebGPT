@@ -88,6 +88,7 @@ class EnhancedConversation(Conversation):
     context to help provide real-time data."""
 
     message_ids: list[int]
+    TIMEZONE: int = (-4) * 3600  # GMT +/- hours * 3600 min/hr
 
     def __init__(self, purpose: str = None) -> None:
         super().__init__(purpose)
@@ -303,10 +304,12 @@ class EnhancedConversation(Conversation):
         weather_response = requests.get(f"https://api.openweathermap.org/data/2.5/weather?q="
                                         f"{city},{country}&appid={_key}&units={units}").json()
 
-        sunrise_time = datetime.fromtimestamp(weather_response['sys']['sunrise'] + weather_response['timezone'] + 25200)
+        sunrise_time = datetime.fromtimestamp(weather_response['sys']['sunrise'] + weather_response['timezone'] -
+                                              EnhancedConversation.TIMEZONE)
         sunrise_time = sunrise_time.strftime('%I:%M %p').lstrip('0')
 
-        sunset_time = datetime.fromtimestamp(weather_response['sys']['sunset'] + weather_response['timezone'] + 25200)
+        sunset_time = datetime.fromtimestamp(weather_response['sys']['sunset'] + weather_response['timezone'] +
+                                             EnhancedConversation.TIMEZONE)
         sunset_time = sunset_time.strftime('%I:%M %p').lstrip('0')
 
         wind_speed = round(weather_response['wind']['speed'] * (3.6 if units == "metric" else 1), 2)
@@ -567,6 +570,7 @@ class EnhancedConversation(Conversation):
         response = response.choices[0].message.content.rstrip('\n')
         self.messages.append({"role": "user", "content": message_content})
         self.messages.append({"role": "assistant", "content": response})
+        embed = None
 
         # create embed
         match search_type:
